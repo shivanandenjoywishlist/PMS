@@ -25,7 +25,7 @@ namespace PMS_DAL.Repositories.ProviderSync
 
         public async Task<List<FlipKartProducts>> GetProduct(string RefrenceId)
         {
-            List<FlipKartProducts> Data =  _context.FlipKartProducts.ToList();
+            List<FlipKartProducts> Data =  _context.FlipKartProducts.Where(x=>x.IsDeleted==false).ToList();
             return Data;
         }
     }

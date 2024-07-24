@@ -3,18 +3,6 @@ using System.Collections.Generic;
 
 namespace COMMON
 {
-    public class ResponseModel<T>
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-        public T Data { get; set; }
-        public List<string> Errors { get; set; }
-
-        public ResponseModel()
-        {
-            Errors = new List<string>();
-        }
-    }
 
     public class JsonModel
     {
@@ -30,8 +18,6 @@ namespace COMMON
         public object Data { get; set; }
         public string Message { get; set; }
         public int StatusCode { get; set; }
-
-
 
     }
 }

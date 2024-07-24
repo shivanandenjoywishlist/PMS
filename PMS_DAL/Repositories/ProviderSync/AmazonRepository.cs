@@ -28,7 +28,7 @@ namespace PMS_DAL.Repositories.ProviderSync
             List<AmazonProducts> data = new List<AmazonProducts>();
             try
             {
-                data =  _context.AmazonProducts
+                data =  _context.AmazonProducts.Where(x=>x.IsDeleted==false)
                                      // .Where(p => p.RefrenceId == RefrenceId)
                                       .ToList();
             }
