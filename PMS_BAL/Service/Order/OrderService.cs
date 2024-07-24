@@ -14,6 +14,7 @@ namespace PMS_BAL.Service.Order
     public class OrderService : BaseService, IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        JsonModel res = new JsonModel();
 
         public OrderService(IOrderRepository orderRepository)
         {
@@ -22,21 +23,40 @@ namespace PMS_BAL.Service.Order
 
         public async Task<JsonModel> CreateOrderAsync(Orders order)
         {
-            JsonModel res = new JsonModel();
-            _orderRepository.Create(order);
-            res.Data = _orderRepository.GetAll();
-            res.StatusCode = 200;
-            res.Message = "OK";
-            return res;
+            try
+            {
+                await _orderRepository.Create(order);
+                res.Data = order;
+                res.StatusCode = 200;
+                res.Message = "OK";
+                return res;
+            }
+            catch (Exception)
+            {
+                res.Data = order;
+                res.StatusCode = 500;
+                res.Message = "Internal Server Error";
+                return res;
+            }
+
         }
         public async Task<JsonModel> GetOrders()
         {
-            JsonModel res = new JsonModel();
-            _orderRepository.GetAll();
-            res.Data = _orderRepository.GetAll();
-            res.StatusCode = 200;
-            res.Message = "OK";
-            return res;
+            try
+            {
+                await _orderRepository.GetAll();
+                res.Data = await _orderRepository.GetAll();
+                res.StatusCode = 200;
+                res.Message = "OK";
+                return res;
+            }
+            catch (Exception)
+            {
+                res.Data = new object();
+                res.StatusCode = 500;
+                res.Message = "Internal Server Error";
+                return res;
+            }
         }
     }
 }

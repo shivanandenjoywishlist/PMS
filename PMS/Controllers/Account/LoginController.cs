@@ -16,11 +16,9 @@ using PMS_BAL.IService.Common;
 [AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]
-public class LoginController : ControllerBase
+public class LoginController : Controller
 {
-  //private readonly ITokenService _tokenService;
-  private readonly ILoginService _loginService;
-
+    private readonly ILoginService _loginService;
     public LoginController(IConfiguration configuration, ILoginService iLoginService)
     {
         _loginService = iLoginService;
@@ -29,8 +27,7 @@ public class LoginController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> Login(ApplicationUser login)
     {
-       var result=await _loginService.Login(login);
-        return Ok(result);
+        return Json(await _loginService.Login(login));
     }
 
 }

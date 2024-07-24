@@ -1,4 +1,5 @@
-﻿using System;
+﻿using COMMON;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace PMS_BAL.IService.Processor
     {
         Task<dynamic> GetDetails();
         Task CreateOrder();
-        Task SyncProducts();
+        Task<JsonModel> SyncProducts();
     }
 }

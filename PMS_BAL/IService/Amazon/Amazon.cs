@@ -19,8 +19,7 @@ namespace PMS_BAL.IService.Amazon
     {
         private readonly IProductRepository _productRepository;
         private readonly IAmazonRepository _amazonRepository;
-
-
+        JsonModel res = new JsonModel();
         public Amazon(IProductRepository productRepository, IAmazonRepository amazonRepository)
         {
             _productRepository = productRepository;
@@ -36,52 +35,33 @@ namespace PMS_BAL.IService.Amazon
             throw new NotImplementedException();
         }
 
-        //public async Task SyncProducts()
-        //{
-        //    const int batchSize = 100;
-        //    List<AmazonProducts> amazonProducts = await _amazonRepository.GetProduct("key"); // Assuming this retrieves all products
-
-        //    int totalProducts = amazonProducts.Count;
-        //    int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
-
-        //    for (int i = 0; i < batches; i++)
-        //    {
-        //        List<AmazonProducts> batchProducts = amazonProducts.Skip(i * batchSize).Take(batchSize).ToList();
-
-        //        List<Products> productsToSave = batchProducts.Select(p => new Products
-        //        {
-        //            Name=p.ProductName,
-        //            Price=p.Price,
-        //            ProductType= "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL",
-        //            Quantity=p.Quantity,
-        //            sku=p.sku,
-        //            CreatedAt=DateTime.Now,
-        //            UpdatedAt= DateTime.Now,
-        //            IsActive=true,
-        //            IsDeleted=false,
-
-        //        }).ToList();
-
-        //        if (productsToSave.Any())
-        //        {
-        //            await _productRepository.CreateBulk(productsToSave);
-        //        }
-        //    }
-        //}
-
-        public async Task SyncProducts()
+        public async Task<JsonModel> SyncProducts()
         {
-            const int batchSize = 100;
-            List<AmazonProducts> amazonProducts = await _amazonRepository.GetProduct("key");
-
-            int totalProducts = amazonProducts.Count;
-            int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
-
-            for (int i = 0; i < batches; i++)
+            try
             {
-                List<AmazonProducts> batchProducts = amazonProducts.Skip(i * batchSize).Take(batchSize).ToList();
+                const int batchSize = 100;
+                List<AmazonProducts> amazonProducts = await _amazonRepository.GetProduct("key");
 
-                await ProcessBatch(batchProducts);
+                int totalProducts = amazonProducts.Count;
+                int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
+
+                for (int i = 0; i < batches; i++)
+                {
+                    List<AmazonProducts> batchProducts = amazonProducts.Skip(i * batchSize).Take(batchSize).ToList();
+
+                    await ProcessBatch(batchProducts);
+                }
+                res.Data = amazonProducts;
+                res.StatusCode = 200;
+                res.Message = "Successfully SyncProducts";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Data = null;
+                res.StatusCode = 500;
+                res.Message = "Error SyncProducts";
+                return res;
             }
         }
 
@@ -134,7 +114,7 @@ namespace PMS_BAL.IService.Amazon
         public async Task<JsonModel> GetProducts()
         {
             JsonModel jsonModel = new JsonModel();
-            jsonModel.Data = _productRepository.GetAll();
+            jsonModel.Data = await _productRepository.GetAll();
             jsonModel.StatusCode = 200;
             jsonModel.Message = "Success";
             return jsonModel;
@@ -142,9 +122,8 @@ namespace PMS_BAL.IService.Amazon
 
         public async Task<JsonModel> CreateProductAsync(Products products)
         {
-            JsonModel res = new JsonModel();
             products.ProductType = "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL";
-            _productRepository.Create(products);
+            await _productRepository.Create(products);
             res.Data = _productRepository.GetAll();
             res.StatusCode = 200;
             res.Message = "OK";
@@ -153,8 +132,7 @@ namespace PMS_BAL.IService.Amazon
 
         public async Task<JsonModel> UpdateProduct(Products products)
         {
-            JsonModel res = new JsonModel();
-            _productRepository.Update(products);
+            await _productRepository.Update(products);
             res.Data = products;
             res.StatusCode = 200;
             res.Message = "OK";
@@ -162,7 +140,6 @@ namespace PMS_BAL.IService.Amazon
         }
         public async Task<JsonModel> DeleteProduct(int Id)
         {
-            JsonModel res = new JsonModel();
             Products data = await _productRepository.GetById(Id);
             await _productRepository.Delete(data);
             res.Data = data;

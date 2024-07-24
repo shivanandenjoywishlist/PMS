@@ -1,14 +1,14 @@
 ﻿using COMMON;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PMS.Controllers.Common;
 using PMS_BAL.IService.Inventory;
 using PMS_Entity;
 
 namespace PMS.Controllers.Inventory
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class InventoryController : ControllerBase
+   
+    public class InventoryController : BaseController
     {
         private readonly IInventoryServiceFactory _inventoryServiceFactory;
 

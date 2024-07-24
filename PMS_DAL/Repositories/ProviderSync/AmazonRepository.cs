@@ -26,19 +26,15 @@ namespace PMS_DAL.Repositories.ProviderSync
         public async Task<List<AmazonProducts>> GetProduct(string RefrenceId)
         {
             List<AmazonProducts> data = new List<AmazonProducts>();
-
             try
             {
-                // Ensure that _context is properly injected and available
                 data =  _context.AmazonProducts
                                      // .Where(p => p.RefrenceId == RefrenceId)
                                       .ToList();
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as per your application's error handling strategy
-                Console.WriteLine($"Error in GetProduct method: {ex.Message}");
-                throw; // Optionally, re-throw the exception to propagate it further
+                throw;
             }
 
             return data;

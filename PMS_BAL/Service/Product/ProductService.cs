@@ -31,9 +31,7 @@ namespace PMS_BAL.Service.Product
 
         public async Task<Products> GetProductsById(int Id)
         {
-           
             Products Data = await _productRepository.GetById(Id);
-           
             return Data;
         }
 
