@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\COMMON\COMMON.csproj" />
+    <ProjectReference Include="..\PMS_DATA\PMS_DATA.csproj" />
+    <ProjectReference Include="..\PMS_Entity\PMS_Entity.csproj" />
+    <ProjectReference Include="..\PMS_Models\PMS_Models.csproj" />
+  </ItemGroup>
+
+</Project>
