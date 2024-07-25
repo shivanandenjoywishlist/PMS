@@ -16,7 +16,6 @@ namespace PMS_BAL.Service.Common
             catch (Exception ex)
             {
                 // Handle exception gracefully
-              
 
                 // Attempt to create an instance of T if possible
                 try
@@ -60,7 +59,6 @@ namespace PMS_BAL.Service.Common
                         throw new Exception($"Error handling property '{propertyInfo.Name}'", propertyEx);
                     }
                 }
-
                 // Rethrow the original exception to propagate it up the call stack
                 throw new Exception("Unhandled exception occurred", ex);
             }

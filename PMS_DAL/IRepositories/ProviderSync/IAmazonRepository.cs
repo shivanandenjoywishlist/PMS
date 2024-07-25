@@ -12,5 +12,6 @@ namespace PMS_DAL.IRepositories.ProviderSync
     public interface IAmazonRepository 
     {
         Task<List<AmazonProducts>> GetProduct(string RefrenceId);
+        Task<List<AmazonProducts>> GetProductsBySku(List<string> skus);
     }
 }

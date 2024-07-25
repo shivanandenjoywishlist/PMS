@@ -51,50 +51,76 @@ namespace PMS_BAL.IService.Amazon
 
                     await ProcessBatch(batchProducts);
                 }
+                await DeletedProduct();
                 res.Data = amazonProducts;
                 res.StatusCode = 200;
                 res.Message = "Successfully SyncProducts";
                 return res;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                res.Data = null;
+                res.Data = new object();
                 res.StatusCode = 500;
                 res.Message = "Error SyncProducts";
                 return res;
             }
         }
 
+        public async Task DeletedProduct()
+        {
+            List<string> productskus =await _productRepository.GetProductsByUpdatedDate(DateTime.UtcNow); //GetData From DataBase
+            List<AmazonProducts> amazonProducts = await _amazonRepository.GetProductsBySku(productskus);//GetData From Amazon
+            if (amazonProducts.Count != productskus.Count)
+            {
+                // Find SKUs that are in `products` but not in `amazonProducts`
+                List<string> deleteProductSkus = productskus.Except(amazonProducts.Select(p => p.sku)).ToList();
+                await _productRepository.BulkDeleteProduct(deleteProductSkus);
+            }
+            const int batchSize = 100;
+            int totalProducts = amazonProducts.Count;
+            int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
+
+            for (int i = 0; i < batches; i++)
+            {
+                List<AmazonProducts> batchProducts = amazonProducts.Skip(i * batchSize).Take(batchSize).ToList();
+
+                await ProcessBatch(batchProducts);
+            }
+        }
+
         private async Task ProcessBatch(List<AmazonProducts> batchProducts)
         {
-            List<Products> productsToSave = new List<Products>();
+            var productsToSave = new List<Products>();
+            var productsToUpdate = new List<Products>();
+
+            // Retrieve existing products in bulk based on SKUs
+            var existingProducts = await _productRepository.GetBySku(batchProducts.Select(p => p.sku).ToList());
 
             foreach (var amazonProduct in batchProducts)
             {
-                var existingProduct = await _productRepository.GetBySkuAsync(amazonProduct.sku);
+                var existingProduct = existingProducts.FirstOrDefault(p => p.sku == amazonProduct.sku);
 
                 if (existingProduct != null)
                 {
+                    // Update existing product
                     existingProduct.Price = amazonProduct.Price;
-                    existingProduct.UpdatedAt = DateTime.Now;
+                    existingProduct.UpdatedAt = DateTime.UtcNow;
                     existingProduct.IsActive = true;
                     existingProduct.IsDeleted = false;
-
-                    await _productRepository.UpdateAsync(existingProduct);
+                    productsToUpdate.Add(existingProduct);
                 }
                 else
                 {
-                    await _productRepository.MarkAsDeletedBySkuAsync(amazonProduct.sku);
-
+                    // Create new product
                     var newProduct = new Products
                     {
                         Name = amazonProduct.ProductName,
                         Price = amazonProduct.Price,
-                        ProductType = "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL",
+                        ProductType = "PMS_BAL.IService.Amazon.Amazon, PMS_BAL",
                         Quantity = amazonProduct.Quantity,
                         sku = amazonProduct.sku,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
+                        CreatedAt = DateTime.UtcNow,
+                        //UpdatedAt = DateTime.UtcNow,
                         IsActive = true,
                         IsDeleted = false,
                     };
@@ -103,26 +129,31 @@ namespace PMS_BAL.IService.Amazon
                 }
             }
 
-            if (productsToSave.Any())
+            // Perform bulk operations
+            if (productsToSave.Count>0)
             {
                 await _productRepository.CreateBulk(productsToSave);
+            }
+
+            if (productsToUpdate.Count>0)
+            {
+                await _productRepository.BulkUpdateAsync(productsToUpdate);
             }
         }
 
 
-
         public async Task<JsonModel> GetProducts()
         {
-            JsonModel jsonModel = new JsonModel();
-            jsonModel.Data = await _productRepository.GetAll();
-            jsonModel.StatusCode = 200;
-            jsonModel.Message = "Success";
-            return jsonModel;
+            
+            res.Data = await _productRepository.GetAll();
+            res.StatusCode = 200;
+            res.Message = "Success";
+            return res;
         }
 
         public async Task<JsonModel> CreateProductAsync(Products products)
         {
-            products.ProductType = "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL";
+            products.ProductType = "PMS_BAL.IService.Amazon.Amazon, PMS_BAL";
             await _productRepository.Create(products);
             res.Data = _productRepository.GetAll();
             res.StatusCode = 200;

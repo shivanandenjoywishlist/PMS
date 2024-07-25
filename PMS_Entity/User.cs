@@ -15,7 +15,7 @@ namespace PMS_Entity
        
         [ForeignKey("userRole")]
         public int RoleId { get; set; }
-        public DateTime CreatedAt { get; set; }= DateTime.Now;
+        public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; }= true;
         public bool IsDelted { get; set; }= false;

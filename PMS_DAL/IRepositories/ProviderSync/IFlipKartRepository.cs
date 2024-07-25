@@ -12,5 +12,7 @@ namespace PMS_DAL.IRepositories.ProviderSync
     public interface IFlipKartRepository : IRepositoryBase<FlipKartProducts>
     {
         Task<List<FlipKartProducts>> GetProduct(string RefrenceId);
+        Task<List<FlipKartProducts>> GetProductsBySku(List<string> skus);
+
     }
 }

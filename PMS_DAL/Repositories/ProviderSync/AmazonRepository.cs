@@ -15,9 +15,7 @@ namespace PMS_DAL.Repositories.ProviderSync
 {
     public class AmazonRepository: IAmazonRepository
     {
-        JsonModel responce = null;
         private readonly ApplicationContext _context;
-
         public AmazonRepository(ApplicationContext context)
         {
             _context=context;
@@ -36,8 +34,14 @@ namespace PMS_DAL.Repositories.ProviderSync
             {
                 throw;
             }
-
             return data;
+        }
+
+        public async Task<List<AmazonProducts>> GetProductsBySku(List<string> skus)
+        {
+            return await _context.AmazonProducts
+                .Where(p => skus.Contains(p.sku))
+                .ToListAsync();
         }
 
     }

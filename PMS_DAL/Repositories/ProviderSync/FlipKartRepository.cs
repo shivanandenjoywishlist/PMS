@@ -15,7 +15,6 @@ namespace PMS_DAL.Repositories.ProviderSync
 {
     public class FlipKartRepository : RepositoryBase<FlipKartProducts>, IFlipKartRepository
     {
-        JsonModel responce = null;
         private readonly ApplicationContext _context;
 
         public FlipKartRepository(ApplicationContext context) : base(context)
@@ -25,8 +24,15 @@ namespace PMS_DAL.Repositories.ProviderSync
 
         public async Task<List<FlipKartProducts>> GetProduct(string RefrenceId)
         {
-            List<FlipKartProducts> Data =  _context.FlipKartProducts.Where(x=>x.IsDeleted==false).ToList();
+            List<FlipKartProducts> Data = await _context.FlipKartProducts.Where(x=>x.IsDeleted==false).ToListAsync();
             return Data;
+        }
+
+        public async Task<List<FlipKartProducts>> GetProductsBySku(List<string> skus)
+        {
+            return await _context.FlipKartProducts
+                .Where(p => skus.Contains(p.sku))
+                .ToListAsync();
         }
     }
 }

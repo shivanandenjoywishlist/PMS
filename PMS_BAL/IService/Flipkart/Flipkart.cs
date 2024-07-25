@@ -14,8 +14,8 @@ namespace PMS_BAL.IService.Flipkart
 {
     public class Flipkart : IFlipkart, IProcessor
     {
-        private IProductRepository _productRepository;
-        private IFlipKartRepository _flipKartRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IFlipKartRepository _flipKartRepository;
         JsonModel res = new JsonModel();
 
         public Flipkart(IProductRepository productRepository, IFlipKartRepository flipKartRepository)
@@ -39,6 +39,7 @@ namespace PMS_BAL.IService.Flipkart
             {
                 const int batchSize = 100;
                 List<FlipKartProducts> flipkartProducts = await _flipKartRepository.GetProduct("key");
+
                 int totalProducts = flipkartProducts.Count;
                 int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
 
@@ -48,49 +49,76 @@ namespace PMS_BAL.IService.Flipkart
 
                     await ProcessBatch(batchProducts);
                 }
+                await DeletedProduct();
                 res.Data = flipkartProducts;
                 res.StatusCode = 200;
                 res.Message = "Successfully SyncProducts";
                 return res;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                res.Data = null;
+                res.Data = new object();
                 res.StatusCode = 500;
                 res.Message = "Error SyncProducts";
                 return res;
             }
         }
+
+        public async Task DeletedProduct()
+        {
+            List<string> productskus = await _productRepository.GetProductsByUpdatedDate(DateTime.UtcNow); //GetData From DataBase
+            List<FlipKartProducts> flipkartProducts = await _flipKartRepository.GetProductsBySku(productskus);//GetData From Amazon
+            if (flipkartProducts.Count != productskus.Count)
+            {
+                // Find SKUs that are in `products` but not in `amazonProducts`
+                List<string> deleteProductSkus = productskus.Except(flipkartProducts.Select(p => p.sku)).ToList();
+                await _productRepository.BulkDeleteProduct(deleteProductSkus);
+            }
+            const int batchSize = 100;
+            int totalProducts = flipkartProducts.Count;
+            int batches = (int)Math.Ceiling((double)totalProducts / batchSize);
+
+            for (int i = 0; i < batches; i++)
+            {
+                List<FlipKartProducts> batchProducts = flipkartProducts.Skip(i * batchSize).Take(batchSize).ToList();
+
+                await ProcessBatch(batchProducts);
+            }
+        }
+
         private async Task ProcessBatch(List<FlipKartProducts> batchProducts)
         {
-            List<Products> productsToSave = new List<Products>();
+            var productsToSave = new List<Products>();
+            var productsToUpdate = new List<Products>();
 
-            foreach (var flipkartProduct in batchProducts)
+            // Retrieve existing products in bulk based on SKUs
+            var existingProducts = await _productRepository.GetBySku(batchProducts.Select(p => p.sku).ToList());
+
+            foreach (var amazonProduct in batchProducts)
             {
-                var existingProduct = await _productRepository.GetBySkuAsync(flipkartProduct.sku);
+                var existingProduct = existingProducts.FirstOrDefault(p => p.sku == amazonProduct.sku);
 
                 if (existingProduct != null)
                 {
-                    existingProduct.Price = flipkartProduct.Price;
-                    existingProduct.UpdatedAt = DateTime.Now;
+                    // Update existing product
+                    existingProduct.Price = amazonProduct.Price;
+                    existingProduct.UpdatedAt = DateTime.UtcNow;
                     existingProduct.IsActive = true;
                     existingProduct.IsDeleted = false;
-
-                    await _productRepository.UpdateAsync(existingProduct);
+                    productsToUpdate.Add(existingProduct);
                 }
                 else
                 {
-                    await _productRepository.MarkAsDeletedBySkuAsync(flipkartProduct.sku);
-
+                    // Create new product
                     var newProduct = new Products
                     {
-                        Name = flipkartProduct.ProductName,
-                        Price = flipkartProduct.Price,
+                        Name = amazonProduct.ProductName,
+                        Price = amazonProduct.Price,
                         ProductType = "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL",
-                        Quantity = flipkartProduct.Quantity,
-                        sku = flipkartProduct.sku,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
+                        Quantity = amazonProduct.Quantity,
+                        sku = amazonProduct.sku,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
                         IsActive = true,
                         IsDeleted = false,
                     };
@@ -99,9 +127,15 @@ namespace PMS_BAL.IService.Flipkart
                 }
             }
 
+            // Perform bulk operations
             if (productsToSave.Any())
             {
                 await _productRepository.CreateBulk(productsToSave);
+            }
+
+            if (productsToUpdate.Any())
+            {
+                await _productRepository.BulkUpdateAsync(productsToUpdate);
             }
         }
 

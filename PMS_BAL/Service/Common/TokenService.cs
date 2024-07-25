@@ -36,7 +36,7 @@ namespace PMS_BAL.Service.Common
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(2), 
+                expires: DateTime.UtcNow.AddMinutes(2), 
                 signingCredentials: creds
             );
 
