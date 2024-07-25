@@ -25,16 +25,6 @@ namespace PMS_BAL.IService.Amazon
             _productRepository = productRepository;
             _amazonRepository = amazonRepository;
         }
-        public Task CreateOrder()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<dynamic> GetDetails()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<JsonModel> SyncProducts()
         {
             try
@@ -92,7 +82,6 @@ namespace PMS_BAL.IService.Amazon
         {
             var productsToSave = new List<Products>();
             var productsToUpdate = new List<Products>();
-
             // Retrieve existing products in bulk based on SKUs
             var existingProducts = await _productRepository.GetBySku(batchProducts.Select(p => p.sku).ToList());
 
@@ -124,11 +113,9 @@ namespace PMS_BAL.IService.Amazon
                         IsActive = true,
                         IsDeleted = false,
                     };
-
                     productsToSave.Add(newProduct);
                 }
             }
-
             // Perform bulk operations
             if (productsToSave.Count>0)
             {
@@ -140,7 +127,6 @@ namespace PMS_BAL.IService.Amazon
                 await _productRepository.BulkUpdateAsync(productsToUpdate);
             }
         }
-
 
         public async Task<JsonModel> GetProducts()
         {
@@ -160,7 +146,6 @@ namespace PMS_BAL.IService.Amazon
             res.Message = "OK";
             return res;
         }
-
         public async Task<JsonModel> UpdateProduct(Products products)
         {
             await _productRepository.Update(products);

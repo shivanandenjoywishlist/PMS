@@ -18,7 +18,7 @@ using PMS_Entity;
 
 namespace PMS_BAL.Service.Login
 {
-    public class LoginService : ILoginService // Assuming ApplicationUser is the correct type
+    public class LoginService : BaseService, ILoginService // Assuming ApplicationUser is the correct type
     {
         private readonly ILoginRepositories _LoginRepositories;
         private readonly IConfiguration _Configuration;

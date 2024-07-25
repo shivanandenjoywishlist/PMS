@@ -21,6 +21,7 @@ using PMS_DAL.Repositories.Login;
 using PMS_DAL.Repositories.Order;
 using PMS_DAL.Repositories.Product;
 using PMS_DAL.Repositories.ProviderSync;
+using System.Text.Json;
 
 public static class BuildUnityContainer
 {
@@ -49,6 +50,13 @@ public static class BuildUnityContainer
         services.AddScoped<Amazon>();
         services.AddScoped<Flipkart>();
         services.AddScoped<IBaseService, BaseService>();
+        
+        services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.IgnoreNullValues = true;
+        });
 
         return services;
        

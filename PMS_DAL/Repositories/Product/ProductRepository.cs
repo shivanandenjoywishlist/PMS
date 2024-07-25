@@ -49,12 +49,12 @@ namespace PMS_DAL.Repositories.Product
         public async Task UpdateAsync(Products product)
         {
             _context.Products.Update(product);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
         public async Task BulkUpdateAsync(List<Products> product)
         {
             _context.Products.UpdateRange(product);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
 
         public async Task<List<string>> GetProductsByUpdatedDate(DateTime UpdatedDate)
@@ -75,7 +75,7 @@ namespace PMS_DAL.Repositories.Product
                 // Optionally, you can set UpdatedAt here if needed
             }
 
-             _context.SaveChanges();
+             await _context.SaveChangesAsync();
         }
     }
 }

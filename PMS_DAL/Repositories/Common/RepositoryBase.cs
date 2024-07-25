@@ -39,7 +39,7 @@ namespace PMS_DAL.Repositories.Common
         }
         public async Task<T> GetById(int id)
         {
-            return await _context.Set<T>().FindAsync(id);
+            return  _context.Set<T>().Find(id);
         }
 
         public async Task<IEnumerable<T>> GetAll()

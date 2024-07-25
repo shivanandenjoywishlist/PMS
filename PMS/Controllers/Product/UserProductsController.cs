@@ -15,48 +15,31 @@ namespace PMS.Controllers.Product
     {
 
         public readonly IProductService _productService;
-        public readonly IAmazon _iAmazon;
 
-        public UserProductsController(IOrderService orderService, IAmazon iAmazon, IProductService productService)
+        public UserProductsController(IOrderService orderService, IProductService productService)
         {
             _productService = productService;
-            _iAmazon= iAmazon;
         }
 
         [HttpGet]
-        public ActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Json(_productService.ExcecuteFunction<Task<JsonModel>>(() => _productService.GetProducts()));
-        }
-
-        [Authorize(Roles = "SuperUser")]
-        [HttpPost]
-        public ActionResult AmazonProductCreate(Products products)
-        {
-            return Json(_productService.ExcecuteFunction<Task<JsonModel>>(() => _iAmazon.CreateProductAsync(products)));
+            return Json(await _productService.ExcecuteFunction<Task<JsonModel>>(() => _productService.GetProducts()));
         }
 
         [Authorize(Roles = "SuperUser")]
         [HttpDelete]
-        public ActionResult DeleteProduct(int Id)
+        public async Task<IActionResult> DeleteProduct(int Id)
         {
-            return Json(_productService.ExcecuteFunction<Task<JsonModel>>(() => _productService.DeleteProduct(Id)));
+            return Json(await _productService.ExcecuteFunction<Task<JsonModel>>(() =>  _productService.DeleteProduct(Id)));
         }
 
         [Authorize(Roles = "SuperUser")]
         [HttpPut]
-        public ActionResult UpdateProduct(Products products)
+        public async Task<IActionResult> UpdateProduct(Products products)
         {
-            return Json(_productService.ExcecuteFunction<Task<JsonModel>>(() => _productService.UpdateProduct(products)));
+            return Json(await _productService.ExcecuteFunction<Task<JsonModel>>(() => _productService.UpdateProduct(products)));
         }
-        //[Authorize(Roles = "SuperUser")]
-        //[HttpPost]
-        //public ActionResult Create(Products products)
-        //{
-        //    var res = _productService.ExcecuteFunction<JsonModel>(() => _productService.CreateProductAsync(products));
-        //    return Ok(res);
-        //}
-
     }
 
 }

@@ -9,8 +9,6 @@ namespace PMS_BAL.IService.Processor
 {
     public interface IProcessor
     {
-        Task<dynamic> GetDetails();
-        Task CreateOrder();
         Task<JsonModel> SyncProducts();
     }
 }

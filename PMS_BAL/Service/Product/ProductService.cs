@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PMS_BAL.Service.Product
 {
     public class ProductService : BaseService, IProductService
     {
         private readonly IProductRepository _productRepository;
+       // JsonModel res = new JsonModel();
 
         public ProductService(IProductRepository productRepository)
         {
@@ -22,11 +24,12 @@ namespace PMS_BAL.Service.Product
 
         public async Task<JsonModel> GetProducts()
         {
-            JsonModel jsonModel = new JsonModel();
-            jsonModel.Data = await _productRepository.GetAll();
-            jsonModel.StatusCode = 200;
-            jsonModel.Message = "Success";
-            return jsonModel;
+            JsonModel res = new JsonModel();
+
+            res.Data = await _productRepository.GetAll();
+            res.StatusCode = 200;
+            res.Message = "Success";
+            return res;
         }
 
         public async Task<Products> GetProductsById(int Id)
@@ -38,30 +41,70 @@ namespace PMS_BAL.Service.Product
         public async Task<JsonModel> CreateProductAsync(Products products)
         {
             JsonModel res = new JsonModel();
-            await _productRepository.Create(products);
-            res.Data = _productRepository.GetAll();
-            res.StatusCode = 200;
-            res.Message = "OK";
+
+            try
+            {
+                await _productRepository.Create(products);
+                res.Data = _productRepository.GetAll();
+                res.StatusCode = 200;
+                res.Message = "OK";
+            }
+            catch (Exception ex)
+            {
+                res.Data = new object();
+                res.StatusCode = 500;
+                res.Message = "Internal Server Error";
+            }
             return res;
         }
 
         public async Task<JsonModel> UpdateProduct(Products products)
         {
             JsonModel res = new JsonModel();
-            await _productRepository.Update(products);
-            res.Data = products;
-            res.StatusCode = 200;
-            res.Message = "OK";
+
+            try
+            {
+                await _productRepository.Update(products);
+                res.Data = products;
+                res.StatusCode = 200;
+                res.Message = "OK";
+            }
+            catch (Exception ex)
+            {
+                res.Data = new object();
+                res.StatusCode = 500;
+                res.Message = "Internal Server Error";
+            }
             return res;
         }
         public async Task<JsonModel> DeleteProduct(int Id)
         {
             JsonModel res = new JsonModel();
-            Products data = await _productRepository.GetById(Id);
-            await _productRepository.Delete(data);
-            res.Data = data;
-            res.StatusCode = 200;
-            res.Message = "OK";
+
+            try
+            {
+                Products data = await _productRepository.GetById(Id);
+                if (data != null)
+                {
+                    await _productRepository.Delete(data);
+                    res.Data = data;
+                    res.StatusCode = 200;
+                    res.Message = "Successfully Product is Deleted";
+                }
+                else
+                {
+                    res.Data = null;
+                    res.StatusCode = 404;
+                    res.Message = "Not Found";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.Data = null;
+                res.StatusCode = 500;
+                res.Message = "Internal Server Error";
+            }
             return res;
         }
 
