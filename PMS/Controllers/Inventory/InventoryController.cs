@@ -26,7 +26,7 @@ namespace PMS.Controllers.Inventory
                 var products = await inventoryService.GetAll();
                 return Ok(products);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving product availability");

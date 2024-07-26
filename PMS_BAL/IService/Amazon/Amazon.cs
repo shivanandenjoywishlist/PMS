@@ -87,7 +87,7 @@ namespace PMS_BAL.IService.Amazon
 
             foreach (var amazonProduct in batchProducts)
             {
-                var existingProduct = existingProducts.FirstOrDefault(p => p.sku == amazonProduct.sku);
+                var existingProduct = existingProducts.FirstOrDefault(p => p.Sku == amazonProduct.sku);
 
                 if (existingProduct != null)
                 {
@@ -107,7 +107,7 @@ namespace PMS_BAL.IService.Amazon
                         Price = amazonProduct.Price,
                         ProductType = "PMS_BAL.IService.Amazon.Amazon, PMS_BAL",
                         Quantity = amazonProduct.Quantity,
-                        sku = amazonProduct.sku,
+                        Sku = amazonProduct.sku,
                         CreatedAt = DateTime.UtcNow,
                         //UpdatedAt = DateTime.UtcNow,
                         IsActive = true,

@@ -24,7 +24,7 @@ namespace PMS_BAL.Service.Product
 
         public async Task<JsonModel> GetProducts()
         {
-            JsonModel res = new JsonModel();
+            var res = new JsonModel();
 
             res.Data = await _productRepository.GetAll();
             res.StatusCode = 200;
@@ -40,7 +40,7 @@ namespace PMS_BAL.Service.Product
 
         public async Task<JsonModel> CreateProductAsync(Products products)
         {
-            JsonModel res = new JsonModel();
+            var res = new JsonModel();
 
             try
             {
@@ -49,7 +49,7 @@ namespace PMS_BAL.Service.Product
                 res.StatusCode = 200;
                 res.Message = "OK";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 res.Data = new object();
                 res.StatusCode = 500;
@@ -60,7 +60,7 @@ namespace PMS_BAL.Service.Product
 
         public async Task<JsonModel> UpdateProduct(Products products)
         {
-            JsonModel res = new JsonModel();
+            var res = new JsonModel();
 
             try
             {
@@ -69,7 +69,7 @@ namespace PMS_BAL.Service.Product
                 res.StatusCode = 200;
                 res.Message = "OK";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 res.Data = new object();
                 res.StatusCode = 500;
@@ -79,7 +79,7 @@ namespace PMS_BAL.Service.Product
         }
         public async Task<JsonModel> DeleteProduct(int Id)
         {
-            JsonModel res = new JsonModel();
+            var res = new JsonModel();
 
             try
             {
@@ -99,7 +99,7 @@ namespace PMS_BAL.Service.Product
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 res.Data = null;
                 res.StatusCode = 500;

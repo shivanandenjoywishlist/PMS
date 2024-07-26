@@ -18,8 +18,8 @@ namespace PMS_DAL.Repositories.Login
 
         public async Task<User> LoginUser(ApplicationUser user)
         {
-            return _context.Users.Include(u => u.userRole) // Eager loading userRole
-                           .FirstOrDefault(u => u.Username == user.Username && u.Password == user.Password);
+            return await _context.Users.Include(u => u.userRole) // Eager loading userRole
+                           .FirstOrDefaultAsync(u => u.Username == user.Username && u.Password == user.Password);
         }
 
     }

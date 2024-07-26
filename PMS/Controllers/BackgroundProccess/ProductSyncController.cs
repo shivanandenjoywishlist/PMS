@@ -24,7 +24,7 @@ namespace PMS.Controllers.BackgroundProccess
         [HttpGet]
         public async Task<IActionResult> SyncProducts()
         {
-            var product = await _productService.GetProductsById(1);
+            var product = await _productService.GetProductsById(12);
             var instance = (IProcessor)_serviceProvider.GetService(Type.GetType(product.ProductType));
             return Json(await _productService.ExcecuteFunction<Task<JsonModel>>(() => instance.SyncProducts()));
         }

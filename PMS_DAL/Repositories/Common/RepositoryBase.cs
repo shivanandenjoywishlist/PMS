@@ -18,47 +18,28 @@ namespace PMS_DAL.Repositories.Common
 
         public async Task Create(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
         public async Task CreateBulk(List<T> entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
             await _context.Set<T>().AddRangeAsync(entity);
-             _context.SaveChanges();
+            _context.SaveChanges();
         }
         public async Task<T> GetById(int id)
         {
-            return  _context.Set<T>().Find(id);
+            return await _context.Set<T>().FindAsync(id);
         }
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return _context.Set<T>().ToList();
+            return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> Find(Func<T, bool> predicate)
-        {
-            return _context.Set<T>().Where(predicate).ToList();
-        }
 
         public async Task Update(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
             _context.Set<T>().Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -66,11 +47,6 @@ namespace PMS_DAL.Repositories.Common
 
         public async Task Delete(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
             _context.Set<T>().Remove(entity);
             await _context.SaveChangesAsync();
         }
@@ -87,7 +63,7 @@ namespace PMS_DAL.Repositories.Common
             //GC.SuppressFinalize(this);
         }
 
-        
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)

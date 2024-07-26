@@ -13,7 +13,7 @@ namespace PMS_DATA.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     [Migration("20240718070213_inital")]
-    partial class inital
+    partial class Inital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

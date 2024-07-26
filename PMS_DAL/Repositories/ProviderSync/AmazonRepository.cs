@@ -23,14 +23,14 @@ namespace PMS_DAL.Repositories.ProviderSync
 
         public async Task<List<AmazonProducts>> GetProduct(string RefrenceId)
         {
-            List<AmazonProducts> data = new List<AmazonProducts>();
+            var data = new List<AmazonProducts>();
             try
             {
-                data =  _context.AmazonProducts.Where(x=>x.IsDeleted==false)
+                data = await _context.AmazonProducts.Where(x=>x.IsDeleted==false)
                                      // .Where(p => p.RefrenceId == RefrenceId)
-                                      .ToList();
+                                      .ToListAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

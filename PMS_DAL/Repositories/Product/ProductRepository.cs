@@ -25,7 +25,7 @@ namespace PMS_DAL.Repositories.Product
         public async Task<List<Products>> GetBySku(List<string> skus)
         {
             var products = await _context.Products
-                .Where(p => skus.Contains(p.sku))
+                .Where(p => skus.Contains(p.Sku))
                 .ToListAsync();
             return products;
         }
@@ -60,12 +60,12 @@ namespace PMS_DAL.Repositories.Product
         public async Task<List<string>> GetProductsByUpdatedDate(DateTime UpdatedDate)
         {
             UpdatedDate.AddHours(-5);
-          return await _context.Products.Where(x => x.UpdatedAt < UpdatedDate).Select(p=>p.sku).ToListAsync();
+          return  await _context.Products.Where(x => x.UpdatedAt < UpdatedDate).Select(p => p.Sku).ToListAsync();
         }
         public async Task MarkAsDeletedBySkuAsync(string sku)
         {
             var productsToDelete = await _context.Products
-                .Where(p => p.sku == sku)
+                .Where(p => p.Sku == sku)
                 .ToListAsync();
 
             foreach (var product in productsToDelete)

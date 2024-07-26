@@ -96,7 +96,7 @@ namespace PMS_BAL.IService.Flipkart
 
             foreach (var amazonProduct in batchProducts)
             {
-                var existingProduct = existingProducts.FirstOrDefault(p => p.sku == amazonProduct.sku);
+                var existingProduct = existingProducts.FirstOrDefault(p => p.Sku == amazonProduct.sku);
 
                 if (existingProduct != null)
                 {
@@ -116,7 +116,7 @@ namespace PMS_BAL.IService.Flipkart
                         Price = amazonProduct.Price,
                         ProductType = "PMS_BAL.IService.Flipkart.Flipkart, PMS_BAL",
                         Quantity = amazonProduct.Quantity,
-                        sku = amazonProduct.sku,
+                        Sku = amazonProduct.sku,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                         IsActive = true,
@@ -128,12 +128,12 @@ namespace PMS_BAL.IService.Flipkart
             }
 
             // Perform bulk operations
-            if (productsToSave.Any())
+            if (productsToSave.Count>0)
             {
                 await _productRepository.CreateBulk(productsToSave);
             }
 
-            if (productsToUpdate.Any())
+            if (productsToUpdate.Count>0)
             {
                 await _productRepository.BulkUpdateAsync(productsToUpdate);
             }
